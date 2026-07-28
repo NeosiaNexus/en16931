@@ -85,9 +85,7 @@ jobs:
           node-version: 24
           registry-url: https://registry.npmjs.org
 
-      # Auth: npm trusted publishing (OIDC) once configured on npmjs.com for
-      # this repo+workflow; NPM_TOKEN is the fallback until then.
+      # Auth: npm trusted publishing (OIDC) — configured on npmjs.com for this
+      # repo + release.yml. No token: the npm CLI exchanges the id-token itself.
       - name: Publish en16931
         run: npm publish --access public --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
