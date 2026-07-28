@@ -11,6 +11,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: canary # local lockfile is v2 (bun 1.4 canary); pin stable once 1.4.0 ships
       - run: bun install --frozen-lockfile
       - run: bun test
 
@@ -25,6 +27,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: canary # local lockfile is v2 (bun 1.4 canary); pin stable once 1.4.0 ships
       - run: bun install --frozen-lockfile
       - name: Wait for validator
         run: |
