@@ -76,13 +76,15 @@ XPath requires exact `xs:decimal` arithmetic; stock fontoxpath computes it in
 float64, which makes arithmetic rules misfire on valid invoices
 (`1.1 + 2.2 = 3.3` → `false` — [FontoXML/fontoxpath#686](https://github.com/FontoXML/fontoxpath/issues/686)).
 
-This repository carries a local patch that fixes it, and the parity claims above
-are made with that patch applied. **The fix is not yet available to consumers**:
-a patch does not travel with an npm package, so until #686 lands upstream or a
-patched fork is published — which is the plan before any npm release — a plain
-`npm install` resolves the unfixed engine. The runner probes the engine at load
-time and reports the truth in every result as `decimalExact`; on an unfixed
-engine you get an explicit warning and `decimalExact: false`, never a silent
+This package depends on
+[`fontoxpath-exact-decimal`](https://www.npmjs.com/package/fontoxpath-exact-decimal)
+— a temporary, minimal fork carrying the fix, aliased as `fontoxpath`, to be
+dropped in favour of upstream the moment #686 is fixed. A plain install
+therefore resolves an engine with exact decimal arithmetic, and the parity
+claims above were verified against that published fork, not a local patch. The
+runner still probes the engine at load time and reports the truth in every
+result as `decimalExact`; should your dependency tree force stock fontoxpath
+instead, you get an explicit warning and `decimalExact: false`, never a silent
 degradation.
 
 ## What it does not do

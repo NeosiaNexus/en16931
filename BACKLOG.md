@@ -12,7 +12,11 @@
 
 ## Prochaines étapes
 
-0. **BLOQUANT publication — le patch décimal ne voyage pas avec le paquet.**
+0. **RÉSOLU (2026-07-28)** — fork `fontoxpath-exact-decimal@3.34.0-exact.1` publié
+   par CI avec provenance, dépendance basculée via alias, patch local supprimé,
+   suite complète verte sur le paquet publié (40 tests + parité 34 fichiers/0 diff).
+   Signalé sur #686. Historique du bloquant ci-dessous :
+   **le patch décimal ne voyage pas avec le paquet.**
    `patchedDependencies` ne s'applique qu'à notre workspace : un `npm install en16931`
    résout fontoxpath vanilla (float64) et BR-O-08 redevient un faux positif chez
    l'utilisateur. Fait : auto-contrôle au chargement (sonde `1.1 + 2.2 = 3.3`,

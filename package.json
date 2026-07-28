@@ -11,13 +11,9 @@
     "typescript": "^5"
   },
   "dependencies": {
-    "fontoxpath": "^3.34.0",
-    "node-schematron": "^2.1.0",
+    "fontoxpath": "npm:fontoxpath-exact-decimal@3.34.0-exact.1",
     "slimdom": "^4.3.5",
     "slimdom-sax-parser": "^1.5.3"
-  },
-  "patchedDependencies": {
-    "fontoxpath@3.34.0": "patches/fontoxpath@3.34.0.patch"
   },
   "license": "MIT AND EUPL-1.2"
 }
