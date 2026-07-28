@@ -1,0 +1,16 @@
+# zizmor — GitHub Actions workflow security linter (run in CI, see ci.yml).
+# https://docs.zizmor.sh/
+#
+# Policy: every `uses:` must be pinned to a full commit SHA, no exceptions —
+# tags are mutable, bytes are not (same reasoning as the vendored cef/ pin).
+rules:
+  unpinned-uses:
+    config:
+      policies:
+        "*": hash-pin
+  dangerous-triggers:
+    ignore:
+      # pr-title.yml uses pull_request_target deliberately so the check also
+      # runs on fork PRs. It never checks out or executes PR code, and no
+      # untrusted input reaches a `run:` step — see its header comment.
+      - pr-title.yml
