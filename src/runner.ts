@@ -22,7 +22,7 @@ export type ValidationResult = {
   fired: Failure[]
 }
 
-import { version as RUNNER_VERSION } from './package.json'
+import { version as RUNNER_VERSION } from '../package.json'
 
 // Our workspace patches fontoxpath for exact xs:decimal arithmetic
 // (patches/fontoxpath@3.34.0.patch, upstream: FontoXML/fontoxpath#686), but a

@@ -16,9 +16,9 @@ browser, where your accounting data never leaves the machine.
 > CI is pinned accordingly.
 
 ```ts
-import { SchematronRunner } from 'en16931'
+import { SchematronRunner, loadCiiSchematron } from 'en16931'
 
-const runner = new SchematronRunner(ciiArtefacts)
+const runner = new SchematronRunner(loadCiiSchematron())
 const result = runner.validate(invoiceXml)
 // {
 //   valid: false,

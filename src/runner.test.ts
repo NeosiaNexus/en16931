@@ -1,7 +1,7 @@
 import { test, expect, describe } from 'bun:test'
 import { readFileSync, readdirSync } from 'node:fs'
 import { SchematronRunner } from './runner'
-import { MUTATIONS } from './mutations'
+import { MUTATIONS } from '../mutations'
 
 const runner = new SchematronRunner(
   readFileSync('cef/cii/schematron/preprocessed/EN16931-CII-validation-preprocessed.sch', 'utf8')

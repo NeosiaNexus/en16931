@@ -1,4 +1,4 @@
-import { SchematronRunner } from './runner'
+import { SchematronRunner } from './src/runner'
 import { readFileSync, readdirSync } from 'node:fs'
 
 const t0 = performance.now()

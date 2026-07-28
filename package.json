@@ -1,19 +1,58 @@
 {
   "name": "en16931",
   "version": "0.0.0",
-  "module": "index.ts",
+  "description": "EN 16931 e-invoice validation in pure TypeScript — runs the official CEF Schematron artefacts (CII stable, UBL experimental) without Java or Docker",
   "type": "module",
-  "private": true,
-  "devDependencies": {
-    "@types/bun": "latest"
+  "main": "./dist/index.js",
+  "types": "./dist/src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "import": "./dist/index.js"
+    }
   },
-  "peerDependencies": {
-    "typescript": "^5"
+  "files": [
+    "dist",
+    "cef/cii/schematron",
+    "cef/ubl/schematron",
+    "cef/LICENSE.txt",
+    "cef/README.md",
+    "cef/VENDORED.md"
+  ],
+  "scripts": {
+    "build": "bun build src/index.ts --outdir dist --target node --format esm --packages external && bunx tsc src/index.ts src/runner.ts --declaration --emitDeclarationOnly --outDir dist --target es2022 --module esnext --moduleResolution bundler --resolveJsonModule --skipLibCheck --strict",
+    "prepublishOnly": "bun run build",
+    "test": "bun test",
+    "bench": "bun bench.ts",
+    "parity": "bun parity.ts"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NeosiaNexus/en16931.git"
+  },
+  "homepage": "https://github.com/NeosiaNexus/en16931#readme",
+  "bugs": "https://github.com/NeosiaNexus/en16931/issues",
+  "keywords": [
+    "en16931",
+    "e-invoicing",
+    "facturation-electronique",
+    "factur-x",
+    "zugferd",
+    "cii",
+    "ubl",
+    "schematron",
+    "validation",
+    "invoice"
+  ],
+  "author": "NeosiaNexus",
+  "license": "MIT AND EUPL-1.2",
   "dependencies": {
-    "fontoxpath": "npm:fontoxpath-exact-decimal@3.34.0-exact.1",
+    "fontoxpath": "npm:fontoxpath-exact-decimal@3.34.0-exact.2",
     "slimdom": "^4.3.5",
     "slimdom-sax-parser": "^1.5.3"
   },
-  "license": "MIT AND EUPL-1.2"
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "^5"
+  }
 }

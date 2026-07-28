@@ -13,7 +13,7 @@
 // evidence is a swept-under-the-rug false negative waiting to happen.
 
 import { readFileSync, readdirSync } from 'node:fs'
-import { SchematronRunner } from './runner'
+import { SchematronRunner } from './src/runner'
 import { MUTATIONS } from './mutations'
 
 const VALIDATOR_URL = process.env.VALIDATOR_URL ?? 'http://localhost:8080/validation'
