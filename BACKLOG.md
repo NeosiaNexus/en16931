@@ -17,10 +17,11 @@
    résout fontoxpath vanilla (float64) et BR-O-08 redevient un faux positif chez
    l'utilisateur. Fait : auto-contrôle au chargement (sonde `1.1 + 2.2 = 3.3`,
    `decimalExact` dans chaque résultat + warning explicite ; sonde vérifiée `false`
-   sur fontoxpath vanilla). Reste avant de publier : si FontoXML/fontoxpath#686
-   ne bouge pas, publier un fork patché (`fontoxpath-exact-decimal` ou équivalent)
-   et en dépendre, documenté comme temporaire avec lien vers #686. **Ne jamais
-   publier en se reposant sur le patch local.**
+   sur fontoxpath vanilla). Reste avant de publier : **préparer le fork patché
+   maintenant** (mentor, 2026-07-28 : « #686 date d'hier, ne compte pas dessus
+   pour début septembre ») — `fontoxpath-exact-decimal` ou équivalent, documenté
+   comme temporaire avec lien vers #686 ; publication npm par l'utilisateur
+   (auth requise). **Ne jamais publier en se reposant sur le patch local.**
 1. **Le repo** — déclencheur atteint (UBL tranché + issue postée). À décider ensemble :
    nom, scope npm, README, et surtout la formulation de la garantie. Décision de
    positionnement associée : « EN 16931 les deux syntaxes » vs « Factur-X/CII d'abord,
