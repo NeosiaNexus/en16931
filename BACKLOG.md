@@ -1,76 +1,85 @@
 # Backlog
 
-## Fait
+Working notes, kept honest. The actionable roadmap items below are meant to be
+mirrored as GitHub issues for visibility; this file is the ledger of decisions
+and hard-won facts, which must survive issue closure.
 
-- **0.1.0 PUBLIÉE (2026-07-28)** : en16931@0.1.0 sur npm, publiée par CI avec
-  provenance après merge de la PR release. Smoke vérifié depuis le registre
-  public sous Node 22 et Bun (XRechnung-O valide, decimalExact true). Fork
-  fontoxpath-exact-decimal@3.34.0-exact.2 (exports map pour Node ESM).
-  Reste côté hygiène : configurer le trusted publishing OIDC sur les deux
-  paquets npm, puis révoquer le token granular exposé.
+## Done
 
-- **UBL tranché (2026-07-28)** : le préprocessé UBL (104 règles, 979 asserts, dont
-  ~648 UBL-CR) passe le garde-fou — même sous-ensemble syntaxique que le CII.
-  19/19 exemples officiels propres, ~257 ms/fichier en moyenne (74–480 ms à chaud).
-  Smoke-parité Saxon : 0 diff sur les 19 fichiers. Reste à faire pour l'UBL :
-  corpus de mutation dédié + intégration dans parity.ts/CI.
-- **Issue upstream fontoxpath postée** : https://github.com/FontoXML/fontoxpath/issues/686
-  (proposition de PR courte incluse ; patch local dans `patches/fontoxpath@3.34.0.patch`).
+- **0.1.0 PUBLISHED (2026-07-28)**: `en16931@0.1.0` on npm, published by CI
+  with provenance after the release PR merged. Smoke-verified from the public
+  registry on Node 22 and Bun (XRechnung-O valid, `decimalExact: true`). Fork
+  `fontoxpath-exact-decimal@3.34.0-exact.2` (exports map for Node ESM).
+  Publishing hygiene: this repo now uses npm trusted publishing (OIDC, bound to
+  `release.yml`); remaining — configure the same on the
+  `fontoxpath-exact-decimal` package, then revoke the exposed granular token.
 
-## Prochaines étapes
+- **UBL decided (2026-07-28)**: the preprocessed UBL artefact (104 rules, 979
+  asserts, ~648 of them UBL-CR) passes the construct guard — same syntactic
+  subset as CII. 19/19 CEF examples clean, ~257 ms/file average (74–480 ms
+  warm). Saxon smoke parity: 0 diffs on the 19 files. Remaining for UBL: a
+  dedicated mutation corpus + integration into the parity script and CI.
 
-0. **RÉSOLU (2026-07-28)** — fork `fontoxpath-exact-decimal@3.34.0-exact.1` publié
-   par CI avec provenance, dépendance basculée via alias, patch local supprimé,
-   suite complète verte sur le paquet publié (40 tests + parité 34 fichiers/0 diff).
-   Signalé sur #686. Historique du bloquant ci-dessous :
-   **le patch décimal ne voyage pas avec le paquet.**
-   `patchedDependencies` ne s'applique qu'à notre workspace : un `npm install en16931`
-   résout fontoxpath vanilla (float64) et BR-O-08 redevient un faux positif chez
-   l'utilisateur. Fait : auto-contrôle au chargement (sonde `1.1 + 2.2 = 3.3`,
-   `decimalExact` dans chaque résultat + warning explicite ; sonde vérifiée `false`
-   sur fontoxpath vanilla). Reste avant de publier : **préparer le fork patché
-   maintenant** (mentor, 2026-07-28 : « #686 date d'hier, ne compte pas dessus
-   pour début septembre ») — `fontoxpath-exact-decimal` ou équivalent, documenté
-   comme temporaire avec lien vers #686 ; publication npm par l'utilisateur
-   (auth requise). **Ne jamais publier en se reposant sur le patch local.**
-1. **Le repo** — déclencheur atteint (UBL tranché + issue postée). À décider ensemble :
-   nom, scope npm, README, et surtout la formulation de la garantie. Décision de
-   positionnement associée : « EN 16931 les deux syntaxes » vs « Factur-X/CII d'abord,
-   UBL en package séparé » (le marché FR initial est dominé par Factur-X/CII ;
-   l'UBL double la surface de maintenance à chaque release CEF).
-2. **Corpus de mutation UBL + parité UBL en CI** — même discipline que le CII.
-3. **Extraction PDF Factur-X**, puis **couche FR** — après la base prouvée.
+- **Upstream fontoxpath issue filed**:
+  <https://github.com/FontoXML/fontoxpath/issues/686> (short PR proposed; the
+  local patch has since been replaced by the published fork).
 
-## À publier le moment venu (matériel README/blog)
+- **Decimal fork shipped (2026-07-28)** — `fontoxpath-exact-decimal` published
+  by CI with provenance, dependency switched via the `fontoxpath` alias, local
+  patch deleted, full suite green against the published package (40 tests +
+  34-file parity, 0 diffs). Noted on #686. Lesson kept from the blocker: **the
+  decimal patch does not travel with the package** — `patchedDependencies`
+  applies only to our workspace, so a plain `npm install en16931` would have
+  resolved vanilla float64 fontoxpath and turned BR-O-08 into a false positive
+  on the user's machine. Hence the load-time probe (`1.1 + 2.2 = 3.3`,
+  `decimalExact` in every result, explicit warning; probe verified `false` on
+  vanilla fontoxpath) and the rule: **never publish relying on a local patch.**
 
-- La tolérance de BR-CO-17/BR-S-09 dans les artefacts CEF est **±1 unité entière**,
-  pas ±0,01 : un centime d'écart sur le montant de TVA passe par conception.
-  Introuvable en doc, source de confusion récurrente.
+- **The repo, professionalized (2026-07-28)**: name settled (`en16931`,
+  unscoped, final; `@en16931` org reserved for future packages), Bun-workspaces
+  monorepo (`packages/en16931`), community health files, hardened CI.
+  Positioning decision recorded: Factur-X/CII first — the initial FR market is
+  dominated by Factur-X/CII; UBL stays in-package but experimental, since it
+  doubles the maintenance surface at every CEF release.
 
-## Risques identifiés à retester plus tard
+## Next
 
-- **`fn:sum()` accumule en float64 dans fontoxpath** (non couvert par le patch
-  opérateurs). Invisible sur les artefacts CEF car leurs auteurs wrappent chaque
-  somme dans `round(... * 100) div 100`. Les extensions françaises **EXT-FR-FE-\***
-  ne sont pas écrites par les auteurs CEF — aucune garantie de la même hygiène
-  défensive. À l'ajout de la couche FR : tester spécifiquement les règles
-  arithmétiques françaises avec des montants qui font dériver une somme float
-  (ex. beaucoup de lignes à 0.1), et si ça mord, étendre le patch à `fn:sum`/`fn:avg`.
+1. **UBL mutation corpus + UBL parity in CI** — same discipline as CII;
+   promotion of UBL to "stable surface" happens then, not before.
+2. **Factur-X PDF extraction**, then the **FR layer (EXT-FR-FE)** — after the
+   proven base.
 
-- **Le validateur de référence easybill (0.6.0) exécute un millésime d'artefacts
-  antérieur à ce qu'il annonce** — divergences documentées et tolérées explicitement
-  dans `parity.ts` (BR-63, BR-50/BR-61/CII-SR-470, CII-SR-009 : textes publiés
-  1.3.15 = 1.3.16, notre comportement conforme au texte, le leur non). Surveiller
-  leurs releases : quand ils passeront en 1.3.16, ces entrées du registre doivent
-  disparaître (la CI le signalera si les diffs s'inversent).
+## To publish when the time comes (README/blog material)
 
-- **Périmètre Schematron** : le runner exécute les artefacts EN 16931 préprocessés,
-  pas Schematron dans l'absolu. Garde-fou au chargement : toute construction hors
-  sous-ensemble (`let`, `value-of`, `report`, patterns abstraits, `defaultPhase`)
-  est une erreur dure, jamais un skip silencieux.
+- The BR-CO-17/BR-S-09 tolerance in the CEF artefacts is **±1 whole unit**,
+  not ±0.01: a one-cent error on the VAT amount passes by design. Documented
+  nowhere upstream, recurring source of confusion.
 
-## Rappel de périmètre produit
+## Identified risks to retest later
 
-Pas de générateur, pas de transport PA. Le validateur EN 16931 qui n'existe pas en JS.
-L'argument n° 1 est la correction (parité Saxon vérifiée en CI, corpus de mutation),
-la perf (~50–200 ms/facture) est le bonus.
+- **`fn:sum()` accumulates in float64 in fontoxpath** (not covered by the
+  operator patch in the fork). Invisible on the CEF artefacts because their
+  authors wrap every sum in `round(... * 100) div 100`. The French
+  **EXT-FR-FE-\*** extensions are not written by the CEF authors — no guarantee
+  of the same defensive hygiene. When adding the FR layer: specifically test
+  the French arithmetic rules with amounts that drift a float sum (e.g. many
+  0.1 lines), and if it bites, extend the fork to `fn:sum`/`fn:avg`.
+
+- **The easybill reference validator (0.6.0) executes an artefact vintage
+  older than it reports** — divergences documented and explicitly tolerated in
+  `packages/en16931/scripts/parity.ts` (BR-63, BR-50/BR-61/CII-SR-470,
+  CII-SR-009: published texts identical in 1.3.15 and 1.3.16, our behaviour
+  matches the text, theirs does not). Watch their releases: when they move to
+  1.3.16, those ledger entries must disappear (CI will flag it when the diffs
+  invert).
+
+- **Schematron scope**: the runner executes the preprocessed EN 16931
+  artefacts, not Schematron at large. Load-time guard: any construct outside
+  the subset (`let`, `value-of`, `report`, abstract patterns, `defaultPhase`)
+  is a hard error, never a silent skip.
+
+## Product scope reminder
+
+No generator, no platform transport. The EN 16931 validator that doesn't exist
+in JS. Argument #1 is correctness (Saxon parity verified in CI, mutation
+corpus); performance (~50–200 ms/invoice) is the bonus.
