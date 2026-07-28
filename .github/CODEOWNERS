@@ -1,0 +1,9 @@
+# Default — catch-all
+* @NeosiaNexus
+
+# Vendored CEF artefacts (EUPL-1.2): files must remain byte-identical.
+# Any PR touching this tree needs explicit owner review.
+packages/en16931/cef/ @NeosiaNexus
+
+# CI/CD & config
+.github/            @NeosiaNexus
