@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    name: Runner tests (valid corpus + mutation corpus)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile
+      - run: bun test
+
+  parity:
+    name: Assert-by-assert parity vs Java/Saxon reference
+    runs-on: ubuntu-latest
+    services:
+      validator:
+        image: easybill/en16931-validator:0.6.0
+        ports:
+          - 8080:8080
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile
+      - name: Wait for validator
+        run: |
+          for i in $(seq 1 30); do
+            code=$(curl -s -o /dev/null -w "%{http_code}" -X POST -H "Content-Type: application/xml" \
+              --data-binary @cef/cii/examples/CII_example1.xml http://localhost:8080/validation || true)
+            [ "$code" = "200" ] && exit 0
+            sleep 2
+          done
+          echo "validator did not become ready" && exit 1
+      - run: bun parity.ts

@@ -1,0 +1,22 @@
+{
+  "name": "en16931",
+  "version": "0.1.0",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "fontoxpath": "^3.34.0",
+    "node-schematron": "^2.1.0",
+    "slimdom": "^4.3.5",
+    "slimdom-sax-parser": "^1.5.3"
+  },
+  "patchedDependencies": {
+    "fontoxpath@3.34.0": "patches/fontoxpath@3.34.0.patch"
+  }
+}
