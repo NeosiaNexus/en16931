@@ -37,10 +37,11 @@ still prove two years later what was checked.
 ## What it does
 
 - Executes the [CEF eInvoicing validation artefacts](https://github.com/ConnectingEurope/eInvoicing-EN16931):
-  a vendored subset of release 1.3.16 (Schematron, official examples, licence —
-  not the XSD/XSLT/EDIFACT parts), individual files unmodified, under EUPL-1.2.
-  The pin is a commit SHA, not a tag — release branches upstream have been
-  observed to move. Exact provenance: [`cef/VENDORED.md`](./cef/VENDORED.md).
+  a subset (Schematron, official examples, licence — not the XSD/XSLT/EDIFACT
+  parts) vendored at a commit that carries release 1.3.16, individual files
+  unmodified, under EUPL-1.2. The release number is a label; the pin is the
+  commit SHA — upstream release branches have been observed to move. Exact
+  provenance: [`cef/VENDORED.md`](./cef/VENDORED.md).
 - **CII (UN/CEFACT Cross Industry Invoice — the syntax under Factur-X/ZUGFeRD):
   stable surface.** ~50–200 ms per invoice.
 - **UBL: experimental.** Passes the 19 official examples (~257 ms per invoice) and a
