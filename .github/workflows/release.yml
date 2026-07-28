@@ -1,0 +1,93 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: 'Publish to npm (skip release-please)'
+        required: true
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  ci:
+    if: ${{ github.event_name == 'push' }}
+    permissions:
+      contents: read
+    uses: ./.github/workflows/ci.yml
+
+  release-please:
+    if: ${{ github.event_name == 'push' }}
+    needs: ci
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+    steps:
+      - uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
+        id: release
+        with:
+          token: ${{ secrets.RELEASE_PAT || secrets.GITHUB_TOKEN }}
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+
+  publish:
+    needs: release-please
+    if: |
+      !failure() && !cancelled() &&
+      (needs.release-please.outputs.release_created == 'true' ||
+       (github.event_name == 'workflow_dispatch' && inputs.publish))
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # Blocker #0 guard: consumers must receive an engine with exact decimal
+      # arithmetic. As long as the repo relies on a local patch
+      # (patchedDependencies), a published package would resolve the unfixed
+      # fontoxpath — refuse to publish, whatever triggered this job.
+      - name: Refuse to publish while depending on the local fontoxpath patch
+        run: |
+          if jq -e '.patchedDependencies' package.json > /dev/null; then
+            echo "::error::package.json still uses patchedDependencies — switch the dependency to the published fontoxpath-exact-decimal fork before releasing (see BACKLOG.md, blocker #0)."
+            exit 1
+          fi
+
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: canary # local lockfile is v2 (bun 1.4 canary); pin stable once 1.4.0 ships
+
+      - run: bun install --frozen-lockfile
+
+      # The whole point of this package is its proof — never ship untested.
+      - run: bun test
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+
+      # Auth: npm trusted publishing (OIDC) once configured on npmjs.com for
+      # this repo+workflow; NPM_TOKEN is the fallback until then.
+      - name: Publish en16931
+        run: npm publish --access public --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
