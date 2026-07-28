@@ -18,5 +18,6 @@
   },
   "patchedDependencies": {
     "fontoxpath@3.34.0": "patches/fontoxpath@3.34.0.patch"
-  }
+  },
+  "license": "MIT AND EUPL-1.2"
 }
