@@ -35,4 +35,7 @@ find cef -type f ! -name VENDORED.md -print0 | LC_ALL=C sort -z \
 ```
 
 Regenerating the sums is only legitimate in the same commit that updates the
-upstream commit hash above.
+upstream commit hash above. The repo's `.gitattributes` marks `cef/**` as
+`-text` so git can never rewrite these bytes (eol conversion) between the
+working tree, the index and a CI checkout — regenerate only from a tree where
+`git status` is clean for `cef/`.
