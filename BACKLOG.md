@@ -2,6 +2,13 @@
 
 ## Fait
 
+- **0.1.0 PUBLIÉE (2026-07-28)** : en16931@0.1.0 sur npm, publiée par CI avec
+  provenance après merge de la PR release. Smoke vérifié depuis le registre
+  public sous Node 22 et Bun (XRechnung-O valide, decimalExact true). Fork
+  fontoxpath-exact-decimal@3.34.0-exact.2 (exports map pour Node ESM).
+  Reste côté hygiène : configurer le trusted publishing OIDC sur les deux
+  paquets npm, puis révoquer le token granular exposé.
+
 - **UBL tranché (2026-07-28)** : le préprocessé UBL (104 règles, 979 asserts, dont
   ~648 UBL-CR) passe le garde-fou — même sous-ensemble syntaxique que le CII.
   19/19 exemples officiels propres, ~257 ms/fichier en moyenne (74–480 ms à chaud).
