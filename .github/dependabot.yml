@@ -1,0 +1,45 @@
+version: 2
+updates:
+  - package-ecosystem: bun
+    directory: /
+    schedule:
+      interval: weekly
+    # Conventional title: the repo is squash-only, so the PR title must pass
+    # the PR-title check and be parseable by release-please.
+    commit-message:
+      prefix: chore
+      include: scope
+    # Wait a week before adopting a new release: a freshly compromised
+    # package version is usually yanked within days. Security advisories
+    # bypass the cooldown.
+    cooldown:
+      default-days: 7
+    ignore:
+      # fontoxpath is an npm alias to the fontoxpath-exact-decimal fork
+      # (exact xs:decimal arithmetic, upstream FontoXML/fontoxpath#686).
+      # Moving it is a deliberate, hand-verified change coupled to the
+      # DECIMAL_EXACT probe and the mutation/parity corpus — never a bot bump.
+      - dependency-name: "fontoxpath"
+    groups:
+      dev-dependencies:
+        dependency-type: development
+        update-types:
+          - "minor"
+          - "patch"
+      production-dependencies:
+        dependency-type: production
+        update-types:
+          - "minor"
+          - "patch"
+    open-pull-requests-limit: 10
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: chore
+      include: scope
+    cooldown:
+      default-days: 7
+    open-pull-requests-limit: 5

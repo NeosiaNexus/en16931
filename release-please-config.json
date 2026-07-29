@@ -1,7 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
   "bump-patch-for-minor-pre-major": true,
-  "changelog-notes-type": "github",
+  "changelog-type": "github",
   "changelog-sections": [
     {
       "type": "feat",
@@ -33,9 +33,13 @@
     }
   ],
   "packages": {
-    ".": {
+    "packages/en16931": {
       "release-type": "node",
-      "bump-minor-pre-major": true
+      "component": "en16931",
+      "include-component-in-tag": true,
+      "include-v-in-tag": true,
+      "bump-minor-pre-major": true,
+      "extra-files": ["src/version.ts"]
     }
   }
 }

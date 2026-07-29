@@ -1,6 +1,6 @@
 // Assert-by-assert parity check against the Java/Saxon reference validator
 // (easybill/en16931-validator, expected on localhost:8080 — see ci.yml).
-// Runs the whole corpus — official valid examples AND mutated invoices — through
+// Runs the whole corpus — valid CEF examples AND mutated invoices — through
 // both engines and diffs the sets of fired rule ids. Exits non-zero on any diff.
 //
 // ── RULE FOR KNOWN_DIVERGENCES — read before adding a line ──────────────────
@@ -12,15 +12,16 @@
 // No proof → no entry → fix the runner instead. An entry that cannot cite its
 // evidence is a swept-under-the-rug false negative waiting to happen.
 
-import { readFileSync, readdirSync } from 'node:fs'
-import { SchematronRunner } from './src/runner'
-import { MUTATIONS } from './mutations'
+import { readdirSync, readFileSync } from 'node:fs'
+import { join } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { loadCiiSchematron, SchematronRunner } from '../src/index.js'
+import { MUTATIONS } from '../test/mutations.js'
 
 const VALIDATOR_URL = process.env.VALIDATOR_URL ?? 'http://localhost:8080/validation'
+const CII_EXAMPLES = fileURLToPath(new URL('../cef/cii/examples/', import.meta.url))
 
-const runner = new SchematronRunner(
-  readFileSync('cef/cii/schematron/preprocessed/EN16931-CII-validation-preprocessed.sch', 'utf8')
-)
+const runner = new SchematronRunner(loadCiiSchematron())
 
 async function saxonRules(xml: string): Promise<{ rules: string[]; version: string }> {
   const res = await fetch(VALIDATOR_URL, {
@@ -62,9 +63,9 @@ const KNOWN_DIVERGENCES = new Map<string, Set<string>>([
 ])
 
 const corpus: { name: string; xml: string }[] = [
-  ...readdirSync('cef/cii/examples')
+  ...readdirSync(CII_EXAMPLES)
     .sort()
-    .map((f) => ({ name: `valid: ${f}`, xml: readFileSync(`cef/cii/examples/${f}`, 'utf8') })),
+    .map((f) => ({ name: `valid: ${f}`, xml: readFileSync(join(CII_EXAMPLES, f), 'utf8') })),
   ...MUTATIONS.map((m) => ({ name: `mutated: ${m.name}`, xml: m.apply(readFileSync(m.base, 'utf8')) })),
 ]
 
@@ -91,6 +92,6 @@ for (const { name, xml } of corpus) {
 }
 
 console.log(
-  `\n${corpus.length} files compared (ours: CEF 1.3.16 preprocessed, saxon: ${saxonVersion}) — ${diffs} diff${diffs === 1 ? '' : 's'}`
+  `\n${corpus.length} files compared (ours: CEF ${runner.artefactsVersion} preprocessed, saxon: ${saxonVersion}) — ${diffs} diff${diffs === 1 ? '' : 's'}`,
 )
 process.exit(diffs ? 1 : 0)

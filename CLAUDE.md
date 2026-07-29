@@ -1,106 +1,84 @@
+# en16931 — project brief
 
-Default to using Bun instead of Node.js.
+EN 16931 e-invoice validator: a pure-TypeScript Schematron runner on fontoxpath
+executing the vendored CEF artefacts. Published on npm as `en16931` — unscoped,
+a firm decision, never rename. CII is the stable surface; UBL is experimental
+until it has its own mutation corpus and CI parity. Correctness is the product;
+performance is the bonus.
 
-- Use `bun <file>` instead of `node <file>` or `ts-node <file>`
-- Use `bun test` instead of `jest` or `vitest`
-- Use `bun build <file.html|file.ts|file.css>` instead of `webpack` or `esbuild`
-- Use `bun install` instead of `npm install` or `yarn install` or `pnpm install`
-- Use `bun run <script>` instead of `npm run <script>` or `yarn run <script>` or `pnpm run <script>`
-- Use `bunx <package> <command>` instead of `npx <package> <command>`
-- Bun automatically loads .env, so don't use dotenv.
+## Layout (Bun-workspaces monorepo)
 
-## APIs
+- `packages/en16931/` — the single published package
+  - `src/` — runner + artefact loaders
+  - `test/` — runner tests + mutation corpus (`mutations.ts`)
+  - `scripts/` — `parity.ts` (Saxon parity + KNOWN_DIVERGENCES ledger), `bench.ts`
+  - `cef/` — vendored CEF artefacts (EUPL-1.2). **Never edit any file in here**;
+    bytes must stay identical to the upstream commit pinned in `cef/VENDORED.md`.
+    Moving the whole directory is allowed; `LICENSE.txt` and `VENDORED.md` move
+    with it.
+- The `@en16931` npm org is reserved for future packages (Factur-X PDF
+  extraction, FR EXT-FR-FE rules, CLI).
 
-- `Bun.serve()` supports WebSockets, HTTPS, and routes. Don't use `express`.
-- `bun:sqlite` for SQLite. Don't use `better-sqlite3`.
-- `Bun.redis` for Redis. Don't use `ioredis`.
-- `Bun.sql` for Postgres. Don't use `pg` or `postgres.js`.
-- `WebSocket` is built-in. Don't use `ws`.
-- Prefer `Bun.file` over `node:fs`'s readFile/writeFile
-- Bun.$`ls` instead of execa.
+## Hard invariants — never break, never "improve"
 
-## Testing
+1. **Public API frozen**: exports `SchematronRunner`, `SchematronParseError`,
+   `DECIMAL_EXACT`, `loadCiiSchematron`, `loadUblSchematron`; types
+   `ValidationResult`, `Failure`, `Assertion`, `Rule`, `Pattern`. ESM only.
+   Additions are semver events; removals/renames are breaking.
+2. **Loader path invariant**: `src/index.ts` resolves `../cef/...` relative to
+   the compiled file, which sits one level below the package root in both
+   `src/` and published `dist/`. Any layout change must keep this true in
+   source AND in the published tarball.
+3. **No silent skips**: Schematron constructs outside the subset (`let`,
+   `value-of`, `report`, abstract patterns, `defaultPhase`) are hard load-time
+   errors. Never add support by skipping.
+4. **Mutation corpus**: one mutation breaks exactly one thing; `expected`
+   justified by published rule text; `allowed` only for real cascades, each
+   commented. Never widen `allowed`/`expected` to green CI.
+5. **Parity ledger** (`scripts/parity.ts` `KNOWN_DIVERGENCES`): a new entry
+   requires textual proof IN THE COMMIT (rule test quoted from `.sch`, source
+   binding AND compiled XSLT, plus a probe of the reference). No proof → fix
+   the runner.
+6. **`release.yml` filename must not change** — npm OIDC trusted publishing is
+   bound to repo + that workflow filename.
+7. **README editorial rules (mentor-imposed)**: three blocks (what it does /
+   the proof / what it does not do); never the words "certified", "official",
+   "approved"; claims follow code, never ahead of it; UBL stays labelled
+   experimental until promoted by evidence. Root `README.md` is canonical;
+   `packages/en16931/README.md` is a byte-identical copy refreshed by the
+   package's `prepack` script — edit the root one only.
 
-Use `bun test` to run tests.
+## Commands
 
-```ts#index.test.ts
-import { test, expect } from "bun:test";
+- `bun install` — lockfile is v2: requires Bun 1.4 (canary today; CI pinned).
+  Contributor-only constraint; consumers are unaffected.
+- `bun test` — 70 tests (CEF examples clean for CII and UBL, mutation corpus,
+  audit trail, construct guards, loaders). All must pass; never weaken.
+- Parity: `docker run --rm -p 8080:8080 easybill/en16931-validator:0.6.0`,
+  then `bun run parity` from `packages/en16931`.
+- `bun run build` in `packages/en16931` — tsc compile + declarations into a
+  flat `dist/` (no nesting: the loader path invariant depends on it).
+- Bun-first: `bun <file>`, `bun test`, `bunx` — not node/jest/npx.
 
-test("hello world", () => {
-  expect(1).toBe(1);
-});
-```
+## Hard-won facts (do not relearn)
 
-## Frontend
+- BR-CO-17/BR-S-09 tolerance in the CEF artefacts is **±1 whole unit**, not
+  ±0.01 — a one-cent VAT error passes by design. Mutations must exceed 1.00.
+- fontoxpath computes `xs:decimal` in float64
+  ([#686](https://github.com/FontoXML/fontoxpath/issues/686)); we depend on the
+  published fork `fontoxpath-exact-decimal` aliased as `fontoxpath`. Drop the
+  alias when upstream fixes #686. The runner probes the engine at load time
+  (`decimalExact` in every result).
+- `fn:sum()` still accumulates in float64 (fork doesn't cover it). Invisible on
+  CEF artefacts (sums wrapped in `round(...*100) div 100`); MUST be retested
+  when adding FR EXT-FR-FE rules.
+- easybill/en16931-validator 0.6.0 executes an older artefact vintage than it
+  reports — that is what the 4 ledger entries document. When they ship 1.3.16,
+  those entries must be removed (CI will flag inverted diffs).
 
-Use HTML imports with `Bun.serve()`. Don't use `vite`. HTML imports fully support React, CSS, Tailwind.
+## Workflow
 
-Server:
-
-```ts#index.ts
-import index from "./index.html"
-
-Bun.serve({
-  routes: {
-    "/": index,
-    "/api/users/:id": {
-      GET: (req) => {
-        return new Response(JSON.stringify({ id: req.params.id }));
-      },
-    },
-  },
-  // optional websocket support
-  websocket: {
-    open: (ws) => {
-      ws.send("Hello, world!");
-    },
-    message: (ws, message) => {
-      ws.send(message);
-    },
-    close: (ws) => {
-      // handle close
-    }
-  },
-  development: {
-    hmr: true,
-    console: true,
-  }
-})
-```
-
-HTML files can import .tsx, .jsx or .js files directly and Bun's bundler will transpile & bundle automatically. `<link>` tags can point to stylesheets and Bun's CSS bundler will bundle.
-
-```html#index.html
-<html>
-  <body>
-    <h1>Hello, world!</h1>
-    <script type="module" src="./frontend.tsx"></script>
-  </body>
-</html>
-```
-
-With the following `frontend.tsx`:
-
-```tsx#frontend.tsx
-import React from "react";
-import { createRoot } from "react-dom/client";
-
-// import .css files directly and it works
-import './index.css';
-
-const root = createRoot(document.body);
-
-export default function Frontend() {
-  return <h1>Hello, world!</h1>;
-}
-
-root.render(<Frontend />);
-```
-
-Then, run index.ts
-
-```sh
-bun --hot ./index.ts
-```
-
-For more information, read the Bun API docs in `node_modules/bun-types/docs/**.mdx`.
+- Conventional Commits (`type(scope): description`); release-please reads them.
+- Never amend commits; ask before any action on main.
+- Docs in English; BACKLOG.md is the working ledger — record decisions and
+  hard-won facts there.

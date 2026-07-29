@@ -1,0 +1,75 @@
+name: Bug Report
+description: Report a bug or unexpected validation behavior
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: A clear and concise description of the bug.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: The smallest invoice XML (or snippet) plus the code that triggers the problem. Redact any real business data.
+      render: xml
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: Which rules should (or should not) fire, and why — cite the EN 16931 rule text if you can.
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: What actually happened — paste the `fired` array of the ValidationResult if relevant.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: syntax
+    attributes:
+      label: Syntax
+      description: Which artefact surface is affected?
+      options:
+        - "CII (stable)"
+        - "UBL (experimental)"
+        - "Not sure"
+    validations:
+      required: true
+
+  - type: input
+    id: runtime
+    attributes:
+      label: Runtime
+      description: Where did you run the validation?
+      placeholder: "e.g. Bun 1.4, Node 24, browser"
+    validations:
+      required: false
+
+  - type: input
+    id: version
+    attributes:
+      label: en16931 version
+      description: The version of the package you are using.
+      placeholder: "e.g. 0.1.0"
+    validations:
+      required: false
+
+  - type: textarea
+    id: reference
+    attributes:
+      label: Reference validator output (optional)
+      description: If you compared against a Java/Saxon-based validator, paste which rules it reports for the same invoice.
+    validations:
+      required: false

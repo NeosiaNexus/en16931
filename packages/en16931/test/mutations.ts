@@ -4,6 +4,8 @@
 // dependent document-level totals) — anything fired outside expected ∪ allowed
 // is a test failure, so unrelated rules cannot hide behind a mutation.
 
+import { fileURLToPath } from 'node:url'
+
 export type Mutation = {
   name: string
   base: string
@@ -19,8 +21,10 @@ function replaceOnce(xml: string, needle: string, replacement: string): string {
   return xml.slice(0, first) + replacement + xml.slice(first + needle.length)
 }
 
-const EX1 = 'cef/cii/examples/CII_example1.xml'
-const EX_O = 'cef/cii/examples/XRechnung-O.xml'
+// Absolute paths so the corpus is importable from any cwd (bun test, parity script).
+const example = (name: string) => fileURLToPath(new URL(`../cef/cii/examples/${name}`, import.meta.url))
+const EX1 = example('CII_example1.xml')
+const EX_O = example('XRechnung-O.xml')
 
 export const MUTATIONS: Mutation[] = [
   // ── Cardinality (BR-01…BR-65): a mandatory term is missing ──────────────
@@ -47,7 +51,7 @@ export const MUTATIONS: Mutation[] = [
       replaceOnce(
         xml,
         '<ram:IssueDateTime>\n            <udt:DateTimeString format="102">20150109</udt:DateTimeString>\n        </ram:IssueDateTime>',
-        ''
+        '',
       ),
   },
   {
@@ -87,7 +91,7 @@ export const MUTATIONS: Mutation[] = [
       replaceOnce(
         xml,
         '<ram:CityName>Velsen-Noord</ram:CityName>\n                    <ram:CountryID>NL</ram:CountryID>',
-        '<ram:CityName>Velsen-Noord</ram:CityName>'
+        '<ram:CityName>Velsen-Noord</ram:CityName>',
       ),
   },
   {
@@ -99,7 +103,7 @@ export const MUTATIONS: Mutation[] = [
       replaceOnce(
         xml,
         '<ram:SpecifiedLineTradeDelivery>\n                <ram:BilledQuantity unitCode="H87">2</ram:BilledQuantity>\n            </ram:SpecifiedLineTradeDelivery>\n            <ram:SpecifiedLineTradeSettlement>\n                <ram:ApplicableTradeTax>\n                    <ram:TypeCode>VAT</ram:TypeCode>\n                    <ram:CategoryCode>S</ram:CategoryCode>\n                    <ram:RateApplicablePercent>6</ram:RateApplicablePercent>\n                </ram:ApplicableTradeTax>\n                <ram:SpecifiedTradeSettlementLineMonetarySummation>\n                    <ram:LineTotalAmount>19.9</ram:LineTotalAmount>',
-        '<ram:SpecifiedLineTradeDelivery>\n            </ram:SpecifiedLineTradeDelivery>\n            <ram:SpecifiedLineTradeSettlement>\n                <ram:ApplicableTradeTax>\n                    <ram:TypeCode>VAT</ram:TypeCode>\n                    <ram:CategoryCode>S</ram:CategoryCode>\n                    <ram:RateApplicablePercent>6</ram:RateApplicablePercent>\n                </ram:ApplicableTradeTax>\n                <ram:SpecifiedTradeSettlementLineMonetarySummation>\n                    <ram:LineTotalAmount>19.9</ram:LineTotalAmount>'
+        '<ram:SpecifiedLineTradeDelivery>\n            </ram:SpecifiedLineTradeDelivery>\n            <ram:SpecifiedLineTradeSettlement>\n                <ram:ApplicableTradeTax>\n                    <ram:TypeCode>VAT</ram:TypeCode>\n                    <ram:CategoryCode>S</ram:CategoryCode>\n                    <ram:RateApplicablePercent>6</ram:RateApplicablePercent>\n                </ram:ApplicableTradeTax>\n                <ram:SpecifiedTradeSettlementLineMonetarySummation>\n                    <ram:LineTotalAmount>19.9</ram:LineTotalAmount>',
       ),
   },
   {
@@ -111,7 +115,7 @@ export const MUTATIONS: Mutation[] = [
       replaceOnce(
         xml,
         '<ram:PayeePartyCreditorFinancialAccount>\n                    <ram:IBANID>NL57 RABO 0107307510</ram:IBANID>\n                </ram:PayeePartyCreditorFinancialAccount>\n            </ram:SpecifiedTradeSettlementPaymentMeans>\n            <ram:SpecifiedTradeSettlementPaymentMeans>',
-        '<ram:PayeePartyCreditorFinancialAccount>\n                </ram:PayeePartyCreditorFinancialAccount>\n            </ram:SpecifiedTradeSettlementPaymentMeans>\n            <ram:SpecifiedTradeSettlementPaymentMeans>'
+        '<ram:PayeePartyCreditorFinancialAccount>\n                </ram:PayeePartyCreditorFinancialAccount>\n            </ram:SpecifiedTradeSettlementPaymentMeans>\n            <ram:SpecifiedTradeSettlementPaymentMeans>',
       ),
   },
 
@@ -134,7 +138,7 @@ export const MUTATIONS: Mutation[] = [
       replaceOnce(
         xml,
         '<ram:InvoiceCurrencyCode>EUR</ram:InvoiceCurrencyCode>',
-        '<ram:InvoiceCurrencyCode>EUX</ram:InvoiceCurrencyCode>'
+        '<ram:InvoiceCurrencyCode>EUX</ram:InvoiceCurrencyCode>',
       ),
   },
   {
@@ -146,7 +150,7 @@ export const MUTATIONS: Mutation[] = [
       replaceOnce(
         xml,
         '<ram:CityName>Velsen-Noord</ram:CityName>\n                    <ram:CountryID>NL</ram:CountryID>',
-        '<ram:CityName>Velsen-Noord</ram:CityName>\n                    <ram:CountryID>XX</ram:CountryID>'
+        '<ram:CityName>Velsen-Noord</ram:CityName>\n                    <ram:CountryID>XX</ram:CountryID>',
       ),
   },
 
@@ -157,7 +161,11 @@ export const MUTATIONS: Mutation[] = [
     expected: ['BR-CO-10', 'BR-CO-13'],
     allowed: [],
     apply: (xml) =>
-      replaceOnce(xml, '<ram:LineTotalAmount>229.6</ram:LineTotalAmount>', '<ram:LineTotalAmount>229.61</ram:LineTotalAmount>'),
+      replaceOnce(
+        xml,
+        '<ram:LineTotalAmount>229.6</ram:LineTotalAmount>',
+        '<ram:LineTotalAmount>229.61</ram:LineTotalAmount>',
+      ),
   },
   {
     name: 'BR-CO-15: grand total off by 0.01',
@@ -165,7 +173,11 @@ export const MUTATIONS: Mutation[] = [
     expected: ['BR-CO-15', 'BR-CO-16'],
     allowed: [],
     apply: (xml) =>
-      replaceOnce(xml, '<ram:GrandTotalAmount>250.33</ram:GrandTotalAmount>', '<ram:GrandTotalAmount>250.34</ram:GrandTotalAmount>'),
+      replaceOnce(
+        xml,
+        '<ram:GrandTotalAmount>250.33</ram:GrandTotalAmount>',
+        '<ram:GrandTotalAmount>250.34</ram:GrandTotalAmount>',
+      ),
   },
   {
     // The CEF test for BR-CO-17 tolerates a full ±1 unit (not ±0.01), so the
@@ -175,7 +187,11 @@ export const MUTATIONS: Mutation[] = [
     expected: ['BR-CO-17', 'BR-CO-14', 'BR-S-09'],
     allowed: [],
     apply: (xml) =>
-      replaceOnce(xml, '<ram:CalculatedAmount>10.99</ram:CalculatedAmount>', '<ram:CalculatedAmount>12.99</ram:CalculatedAmount>'),
+      replaceOnce(
+        xml,
+        '<ram:CalculatedAmount>10.99</ram:CalculatedAmount>',
+        '<ram:CalculatedAmount>12.99</ram:CalculatedAmount>',
+      ),
   },
 
   // ── Per-category VAT (BR-S, BR-O): breakdown arithmetic ─────────────────
@@ -203,6 +219,10 @@ export const MUTATIONS: Mutation[] = [
     expected: ['BR-DEC-18', 'BR-CO-16'],
     allowed: [],
     apply: (xml) =>
-      replaceOnce(xml, '<ram:DuePayableAmount>250.33</ram:DuePayableAmount>', '<ram:DuePayableAmount>250.333</ram:DuePayableAmount>'),
+      replaceOnce(
+        xml,
+        '<ram:DuePayableAmount>250.33</ram:DuePayableAmount>',
+        '<ram:DuePayableAmount>250.333</ram:DuePayableAmount>',
+      ),
   },
 ]

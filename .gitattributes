@@ -1,0 +1,6 @@
+# Vendored CEF artefacts are pinned by bytes (see packages/en16931/cef/VENDORED.md
+# and the cef.SHA256SUMS integrity check in CI). No eol conversion, no diff
+# heuristics — git must never rewrite a single byte of them. The CI integrity
+# failure that motivated this rule: a CRLF working-tree copy of LICENSE.txt
+# poisoned the checksum manifest while the committed blob was fine.
+packages/en16931/cef/** -text

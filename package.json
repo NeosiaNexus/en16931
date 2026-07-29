@@ -1,58 +1,28 @@
 {
-  "name": "en16931",
-  "version": "0.1.0",
-  "description": "EN 16931 e-invoice validation in pure TypeScript — runs the official CEF Schematron artefacts (CII stable, UBL experimental) without Java or Docker",
+  "name": "en16931-monorepo",
+  "private": true,
   "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/src/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/src/index.d.ts",
-      "import": "./dist/index.js"
-    }
-  },
-  "files": [
-    "dist",
-    "cef/cii/schematron",
-    "cef/ubl/schematron",
-    "cef/LICENSE.txt",
-    "cef/README.md",
-    "cef/VENDORED.md"
+  "packageManager": "bun@1.4.0",
+  "workspaces": [
+    "packages/*"
   ],
   "scripts": {
-    "build": "bun build src/index.ts --outdir dist --target node --format esm --packages external && bunx tsc src/index.ts src/runner.ts --declaration --emitDeclarationOnly --outDir dist --target es2022 --module esnext --moduleResolution bundler --resolveJsonModule --skipLibCheck --strict",
-    "prepublishOnly": "bun run build",
+    "build": "bun run --filter '*' build",
+    "typecheck": "bun run --filter '*' typecheck",
     "test": "bun test",
-    "bench": "bun bench.ts",
-    "parity": "bun parity.ts"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/NeosiaNexus/en16931.git"
-  },
-  "homepage": "https://github.com/NeosiaNexus/en16931#readme",
-  "bugs": "https://github.com/NeosiaNexus/en16931/issues",
-  "keywords": [
-    "en16931",
-    "e-invoicing",
-    "facturation-electronique",
-    "factur-x",
-    "zugferd",
-    "cii",
-    "ubl",
-    "schematron",
-    "validation",
-    "invoice"
-  ],
-  "author": "NeosiaNexus",
-  "license": "MIT AND EUPL-1.2",
-  "dependencies": {
-    "fontoxpath": "npm:fontoxpath-exact-decimal@3.34.0-exact.2",
-    "slimdom": "^4.3.5",
-    "slimdom-sax-parser": "^1.5.3"
+    "lint": "biome check .",
+    "format": "biome check --write .",
+    "bench": "bun run --filter en16931 bench",
+    "parity": "bun run --filter en16931 parity",
+    "pkg-check": "bun run --filter en16931 pkg-check",
+    "verify": "bun run lint && bun run typecheck && bun run test && bun run pkg-check"
   },
   "devDependencies": {
-    "@types/bun": "latest",
-    "typescript": "^5"
+    "@arethetypeswrong/cli": "^0.18.0",
+    "@biomejs/biome": "^2.0.0",
+    "@types/bun": "^1.3.14",
+    "@types/node": "^22.0.0",
+    "publint": "^0.3.0",
+    "typescript": "^5.9.0"
   }
 }
