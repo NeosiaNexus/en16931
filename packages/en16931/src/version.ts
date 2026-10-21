@@ -4,4 +4,4 @@
 // package.json is found and silently reported). release-please rewrites the
 // annotated line below at release time so it cannot drift from package.json,
 // and a test asserts the two match.
-export const RUNNER_VERSION = '0.1.0' // x-release-please-version
+export const RUNNER_VERSION = '0.1.1' // x-release-please-version

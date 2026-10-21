@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.1 (2026-07-29)
+
+## What's Changed
+* feat: monorepo restructure, typed Schematron parse errors, hardened CI/CD by @NeosiaNexus in https://github.com/NeosiaNexus/en16931/pull/3
+
+## New Contributors
+* @NeosiaNexus made their first contribution in https://github.com/NeosiaNexus/en16931/pull/3
+
+**Full Changelog**: https://github.com/NeosiaNexus/en16931/compare/en16931-v0.1.0...en16931-v0.1.1
+
 ## 0.1.0 (2026-07-28)
 
 
