@@ -1,6 +1,6 @@
 {
   "name": "en16931",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "EN 16931 e-invoice validation in pure TypeScript — runs the European Commission's published CEF Schematron artefacts (CII stable, UBL experimental) without Java or Docker",
   "license": "MIT AND EUPL-1.2",
   "author": "NeosiaNexus",
